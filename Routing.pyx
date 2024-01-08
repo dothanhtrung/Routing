@@ -34,7 +34,7 @@ NETLINK_ROUTE =  0
 NL_DUMP_LINE = 0
 
 
-cdef void delete_route_cb(nl_object * obj, void * arg):
+cdef void delete_route_cb(nl_object * obj, void * arg) noexcept:
         cdef rtnl_route * route = <rtnl_route *> obj
         cdef nl_sock * sock = <nl_sock *> arg
         cdef int err = 1
@@ -42,7 +42,7 @@ cdef void delete_route_cb(nl_object * obj, void * arg):
         err = rtnl_route_delete(sock, route, 0)
         if (err < 0): raise Exception(nl_geterror(err))
 
-cdef void delete_addr_cb(nl_object * obj, void * arg):
+cdef void delete_addr_cb(nl_object * obj, void * arg) noexcept:
         cdef rtnl_addr * addr = <rtnl_addr *> obj
         cdef nl_sock * sock = <nl_sock *> arg
         cdef int err = 1
