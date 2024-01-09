@@ -317,13 +317,13 @@ cdef class Addressing:
         self.__resync_caches()
 
         if self.family is not None:
-            self.__set_family(self.family)
+            self.__set_family(self.family.encode("latin-1"))
 
         memset(self.buff, 0, len(self.buff))
         nl_cache_dump_filter(self.addr_cache,
                              &self.params,
                              <nl_object *>self.__addr)
-        return self.buff
+        return self.buff.decode("latin-1")
 
 
     @need_clean_addr_obj
