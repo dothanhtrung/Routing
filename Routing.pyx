@@ -60,7 +60,7 @@ def need_clean_route_obj(method_to_decorate):
 
 def need_clean_addr_obj(method_to_decorate):
     def wrapper(self, * args, **kwargs):
-        self.__alloc_addr()
+        self._alloc_addr()
         method_to_decorate(self, *args, **kwargs)
 
     return wrapper
@@ -68,9 +68,9 @@ def need_clean_addr_obj(method_to_decorate):
 
 def sync_cache(method_to_decorate):
     def wrapper(self, * args, **kwargs):
-        self.__resync_caches()
+        self._resync_caches()
         ret = method_to_decorate(self, *args, **kwargs)
-        self.__resync_caches()
+        self._resync_caches()
         return ret
     return wrapper
 
@@ -124,7 +124,7 @@ cdef class Routing:
         if self.__route is NULL:
             raise MemoryError()
 
-    def __resync_caches(self):
+    def _resync_caches(self):
         """decorator: synchronize/refill the link and the routing caches"""
         nl_cache_refill(self.sock, self.link_cache)
         nl_cache_refill(self.sock, self.route_cache)
@@ -142,7 +142,7 @@ cdef class Routing:
 
     def __repr__(self):
         self.__alloc_route()
-        self.__resync_caches()
+        self._resync_caches()
 
         if self.family:
             self.__set_family(self.family)
@@ -288,7 +288,7 @@ cdef class Addressing:
         if self.addr_cache is NULL:
             raise MemoryError()
 
-    def __alloc_addr(self):
+    def _alloc_addr(self):
         if self.__addr is not NULL:
             rtnl_addr_put(self.__addr)
 
@@ -296,7 +296,7 @@ cdef class Addressing:
         if self.__addr is NULL:
             raise MemoryError()
 
-    def __resync_caches(self):
+    def _resync_caches(self):
         """decorator: synchronize/refill the link and the routing caches"""
         nl_cache_refill(self.sock, self.link_cache)
         nl_cache_refill(self.sock, self.addr_cache)
@@ -313,8 +313,8 @@ cdef class Addressing:
         nl_cli_addr_parse_family(self.__addr, arg)
 
     def __repr__(self):
-        self.__alloc_addr()
-        self.__resync_caches()
+        self._alloc_addr()
+        self._resync_caches()
 
         if self.family is not None:
             self.__set_family(self.family.encode("latin-1"))
@@ -439,6 +439,8 @@ cdef class Link:
         nl_cache_refill(self.sock, self.link_cache)
 
         if isinstance(ifaces, str):
+            nl_cli_link_parse_name(self.__link, ifaces.encode("latin-1"))
+        elif isinstance(ifaces, bytes):
             nl_cli_link_parse_name(self.__link, ifaces)
         elif isinstance(ifaces, list):
             for iface in ifaces:
