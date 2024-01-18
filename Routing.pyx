@@ -53,7 +53,7 @@ cdef void delete_addr_cb(nl_object * obj, void * arg) noexcept:
 
 def need_clean_route_obj(method_to_decorate):
     def wrapper(self, * args, **kwargs):
-        self.__alloc_route()
+        self._alloc_route()
         method_to_decorate(self, *args, **kwargs)
 
     return wrapper
@@ -117,7 +117,7 @@ cdef class Routing:
         if self.route_cache is NULL:
             raise MemoryError()
 
-    def __alloc_route(self):
+    def _alloc_route(self):
         if self.__route is not NULL:
             rtnl_route_put(self.__route)
         self.__route = nl_cli_route_alloc()
@@ -141,7 +141,7 @@ cdef class Routing:
         nl_cli_route_parse_family(self.__route, arg)
 
     def __repr__(self):
-        self.__alloc_route()
+        self._alloc_route()
         self._resync_caches()
 
         if self.family:
