@@ -138,6 +138,8 @@ cdef class Routing:
             self.family = family
 
     def __set_family(self, arg):
+        if isinstance(arg, str):
+            arg = arg.encode("latin-1")
         nl_cli_route_parse_family(self.__route, arg)
 
     def __repr__(self):
@@ -216,12 +218,18 @@ cdef class Routing:
             self.__set_family(self.family)
 
         if destination:
+            if isinstance(destination, str):
+               destination = destination.encode("latin-1")
             nl_cli_route_parse_dst(self.__route, destination)
 
         if source:
+            if isinstance(source, str):
+               source = source.encode("latin-1")
             nl_cli_route_parse_src(self.__route, source)
 
         if table:
+            if isinstance(table, str):
+               table = table.encode("latin-1")
             nl_cli_route_parse_table(self.__route, table)
 
         if isinstance(nexthop, list):
@@ -231,7 +239,7 @@ cdef class Routing:
                 nl_cli_route_parse_nexthop(self.__route, hop, self.link_cache)
         elif nexthop:
             nh = ",".join([ "=".join(arg) for arg in zip(NH_ARGS, nexthop) ])
-            nl_cli_route_parse_nexthop(self.__route, nh, self.link_cache)
+            nl_cli_route_parse_nexthop(self.__route, nh.encode("latin-1"), self.link_cache)
 
         nl_cache_foreach_filter(self.route_cache, <nl_object *> self.__route, &delete_route_cb, self.sock)
 
@@ -310,6 +318,8 @@ cdef class Addressing:
             self.family = family
 
     def __set_family(self, arg):
+        if isinstance(arg, str):
+            arg = arg.encode("latin-1")
         nl_cli_addr_parse_family(self.__addr, arg)
 
     def __repr__(self):
